@@ -14,6 +14,7 @@ from sqlalchemy import (
     Table,
     UniqueConstraint,
     func,
+    Text
 )
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -191,5 +192,40 @@ class Todo(Base):
         }
 
 
-MODEL = User | Token | Todo | Role | Right
+class Advertisement(Base):
+    __tablename__ = "advertisement"
+    _model = "advertisement"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=True)
+    price: Mapped[float] = mapped_column(nullable=False)
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime,
+        server_default=func.now(),
+    )
+
+    author_id: Mapped[int] = mapped_column(ForeignKey("todo_user.id"), nullable=False)
+    author: Mapped[User] = relationship(User, back_populates="advertisements")
+
+    @property
+    def dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "price": self.price,
+            "created_at": self.created_at.isoformat(),
+            "author_id": self.author_id,
+        }
+
+# Добавляем связь с пользователем (User)
+User.advertisements = relationship(
+    "Advertisement",
+    back_populates="author",
+    cascade="all, delete-orphan",
+    lazy="joined",
+)
+
+MODEL = User | Token | Todo | Role | Right | Advertisement
 MODEL_CLS = type[MODEL]
