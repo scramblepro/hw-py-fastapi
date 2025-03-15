@@ -1,0 +1,14 @@
+GET http://127.0.0.1:8000/ads
+
+
+POST http://127.0.0.1:8000/ads
+Content-Type: application/json
+
+{
+  "title": "Продам ноутбук",
+  "description": "MacBook Pro 2021, состояние отличное",
+  "price": 150000
+}
+
+
+DELETE http://127.0.0.1:8000/ads/1

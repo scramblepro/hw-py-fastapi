@@ -1,5 +1,5 @@
-from .auth import hash_password
-from .models import Right, Role, Session, Todo, User
+from auth import hash_password
+from models import Right, Role, Session, User
 
 
 async def create_admin_user(
@@ -9,21 +9,21 @@ async def create_admin_user(
 ) -> None:
     write_rights = [
         Right(
-            model=model._model,
+            model=model.__name__,
             write=True,
             read=False,
             only_own=False,
         )
-        for model in (Right, Role, User, Todo)
+        for model in (Right, Role, User)
     ]
     read_rights = [
         Right(
-            model=model._model,
+            model=model.__name__,
             write=False,
             read=True,
             only_own=False,
         )
-        for model in (Right, Role, User, Todo)
+        for model in (Right, Role, User)
     ]
     rights = [*write_rights, *read_rights]
     role = Role(name="admin", rights=rights)
@@ -35,10 +35,10 @@ async def create_admin_user(
 async def create_user_role(session: Session) -> None:
     rights = []
     for wr in True, False:
-        for model in (User, Todo):
+        for model in (User,):
             rights.append(
                 Right(
-                    model=model._model,
+                    model=model.__name__,
                     write=wr,
                     read=not wr,
                     only_own=True,

@@ -1,11 +1,11 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from .models import Advertisement
-from .crud import AdvertisementCreate, AdvertisementUpdate, AdvertisementResponse
+from models import Advertisement
+from crud import AdvertisementCreate, AdvertisementUpdate, AdvertisementResponse
 from typing import List, Optional
 
 
-async def create_advertisement(db: AsyncSession, ad_data: AdvertisementCreate, user_id: int) -> Advertisement:
+async def create_ad(db: AsyncSession, ad_data: AdvertisementCreate, user_id: int) -> Optional[Advertisement]:
     """Создание объявления"""
     new_ad = Advertisement(
         title=ad_data.title,
@@ -19,13 +19,19 @@ async def create_advertisement(db: AsyncSession, ad_data: AdvertisementCreate, u
     return new_ad
 
 
-async def get_advertisement_by_id(db: AsyncSession, ad_id: int) -> Optional[Advertisement]:
+async def get_all_ads(db: AsyncSession) -> List[Advertisement]:
+    """Получение списка всех объявлений"""
+    result = await db.execute(select(Advertisement))
+    return result.scalars().all()
+
+
+async def get_ad_by_id(db: AsyncSession, ad_id: int) -> Optional[Advertisement]:
     """Получение объявления по ID"""
     result = await db.execute(select(Advertisement).where(Advertisement.id == ad_id))
     return result.scalar_one_or_none()
 
 
-async def update_advertisement(db: AsyncSession, ad_id: int, ad_data: AdvertisementUpdate, user_id: int) -> Optional[Advertisement]:
+async def update_ad(db: AsyncSession, ad_id: int, ad_data: AdvertisementUpdate, user_id: int) -> Optional[Advertisement]:
     """Обновление объявления (пользователь может редактировать только свои объявления)"""
     result = await db.execute(select(Advertisement).where(Advertisement.id == ad_id, Advertisement.author_id == user_id))
     ad = result.scalar_one_or_none()
@@ -41,7 +47,7 @@ async def update_advertisement(db: AsyncSession, ad_id: int, ad_data: Advertisem
     return ad
 
 
-async def delete_advertisement(db: AsyncSession, ad_id: int, user_id: int) -> bool:
+async def delete_ad(db: AsyncSession, ad_id: int, user_id: int) -> bool:
     """Удаление объявления (только автор может удалить)"""
     result = await db.execute(select(Advertisement).where(Advertisement.id == ad_id, Advertisement.author_id == user_id))
     ad = result.scalar_one_or_none()
