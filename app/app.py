@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from routes import router
 
 app = FastAPI(
-    title="Todo API",
+    title="Adverstiment_services_api",
     version="1.0",
     description="Ads API",
 )
@@ -17,3 +17,4 @@ app.include_router(router)
 # @app.get("/")
 # def read_root():
 #     return {"message": "API is running"}
+                                                

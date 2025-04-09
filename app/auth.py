@@ -4,6 +4,9 @@ from fastapi import HTTPException
 from models import Right, Role, Token, User, user_roles, role_rights
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+import jwt
+from datetime import datetime, timedelta
+from config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 def hash_password(password: str) -> str:
@@ -58,3 +61,25 @@ async def get_default_role(session: AsyncSession) -> Role:
     Возвращает роль по умолчанию.
     """
     return (await session.scalars(select(Role).where(Role.name == DEFAULT_ROLE))).first()
+
+
+async def create_access_token(user_id: int) -> str:
+    """
+    Создает JWT-токен с user_id.
+    """
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    payload = {"sub": str(user_id), "exp": expire}
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+
+async def verify_access_token(token: str) -> int:
+    """
+    Проверяет JWT-токен и возвращает user_id.
+    """
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return int(payload["sub"])
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
