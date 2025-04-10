@@ -1,9 +1,11 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 from passlib.context import CryptContext
 import crud
 import schemas
 import dependencies
-from dependencies import UserDependency
+from schemas import update_ad
+from crud import AdvertisementResponse, AdvertisementUpdate
+from dependencies import UserDependency, get_db, get_current_user
 from models import User, Role
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -65,9 +67,13 @@ async def list_roles(db: dependencies.SessionDependency):
 
 
 @router.post("/ads/", response_model=crud.AdvertisementResponse)
-async def create_advertisement(ad: crud.AdvertisementCreate, db: dependencies.SessionDependency):
+async def create_advertisement(
+    ad: crud.AdvertisementCreate, 
+    db: dependencies.SessionDependency, 
+    current_user=Depends(get_current_user),
+):
     """Создание объявления."""
-    return await schemas.create_ad(db, ad, user_id=1)
+    return await schemas.create_ad(db, ad, user_id=current_user.id)
 
 
 @router.get("/ads/{ad_id}", response_model=crud.AdvertisementResponse)
@@ -85,16 +91,36 @@ async def list_advertisements(db: dependencies.SessionDependency):
     return await schemas.get_all_ads(db)
 
 
-@router.put("/ads/{ad_id}", response_model=crud.AdvertisementResponse)
-async def update_advertisement(ad_id: int, ad_update: crud.AdvertisementUpdate, db: dependencies.SessionDependency):
-    """Обновление объявления."""
-    return await schemas.update_ad(db, ad_id, ad_update)
+@router.put("/ads/{ad_id}", response_model=AdvertisementResponse)
+async def update_ad_endpoint(
+    ad_id: int,
+    ad_data: AdvertisementUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    updated_ad = await update_ad(db, ad_id, ad_data, current_user.id)
+
+    if updated_ad is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Объявление не найдено или у вас нет прав на его редактирование",
+        )
+
+    return updated_ad
 
 
 @router.delete("/ads/{ad_id}")
-async def delete_advertisement(ad_id: int, db: dependencies.SessionDependency):
-    """Удаление объявления."""
-    await schemas.delete_ad(db, ad_id)
+async def delete_advertisement(
+    ad_id: int,
+    db: dependencies.SessionDependency,
+    current_user=Depends(get_current_user),
+):
+    success = await schemas.delete_ad(db, ad_id, user_id=current_user.id)
+    if not success:
+        raise HTTPException(
+            status_code=404,
+            detail="Объявление не найдено или у вас нет прав на его удаление",
+        )
     return {"detail": "Advertisement deleted"}
 
 
