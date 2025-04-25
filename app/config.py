@@ -18,7 +18,7 @@ TOKEN_TTL = int(os.getenv("TOKEN_TTL", 60))
 SQL_DEBUG = os.getenv("SQL_DEBUG", "False").lower() in ("true", "1")
 DEFAULT_ROLE = os.getenv("DEFAULT_ROLE", "user")
 
-SECRET_KEY = os.getenv("SECRET_KEY", "qwerty")  # Используй более сложный ключ
+SECRET_KEY = os.getenv("SECRET_KEY", "qwerty")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
 
