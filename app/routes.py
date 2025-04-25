@@ -3,7 +3,7 @@ from passlib.context import CryptContext
 import crud
 import schemas
 import dependencies
-from schemas import update_ad
+from schemas import update_ad, UserRegister
 from crud import AdvertisementResponse, AdvertisementUpdate
 from dependencies import UserDependency, get_db, get_current_user
 from models import User, Role
@@ -11,18 +11,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from auth import create_access_token, verify_access_token
 from fastapi.security import OAuth2PasswordBearer
-from pydantic import BaseModel
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/login")
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-# ✅ Pydantic-модель для регистрации пользователя
-class UserRegister(BaseModel):
-    name: str
-    password: str
 
 
 @router.post("/users/register")
@@ -70,7 +63,7 @@ async def list_roles(db: dependencies.SessionDependency):
 async def create_advertisement(
     ad: crud.AdvertisementCreate, 
     db: dependencies.SessionDependency, 
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """Создание объявления."""
     return await schemas.create_ad(db, ad, user_id=current_user.id)

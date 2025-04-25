@@ -3,6 +3,11 @@ from sqlalchemy.future import select
 from models import Advertisement
 from crud import AdvertisementCreate, AdvertisementUpdate, AdvertisementResponse
 from typing import List, Optional
+from pydantic import BaseModel
+
+class UserRegister(BaseModel):
+    name: str
+    password: str
 
 
 async def create_ad(db: AsyncSession, ad_data: AdvertisementCreate, user_id: int) -> AdvertisementResponse:

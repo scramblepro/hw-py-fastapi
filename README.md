@@ -1,18 +1,28 @@
-## TodoApi
 
-```bash
-docker-compose --env-file .env-example up db # Start the database
-```
+FastAPI-сервис объявлений
+Простой API для создания, редактирования, удаления и получения объявлений с авторизацией пользователей и ролями.
 
-```bash
-docker-compose --env-file .env-example up migrate # Start migration
-```
+Установка и запуск:
 
-```bash
-docker-compose --env-file .env-example up app # Start the application
-```
+git clone https://github.com/yourusername/your-repo.git
+cd your-repo
+python -m venv venv
+source venv/bin/activate  # или venv\Scripts\activate на Windows
+pip install -r requirements.txt
+cp .env.example .env
 
-```bash
-docker-compose --env-file .env-example up tests # Start tests
-```
-# hw-py-fastapi
+Переменные окружения (.env):
+Создайте файл .env по шаблону .env.example
+
+Запуск приложения:
+
+uvicorn app.main:app --reload
+
+Аутентификация:
+
+Используется JWT. Для запросов, требующих авторизации, нужно передавать токен:
+
+Authorization: Bearer <ваш_токен>
+
+Примеры запросов:
+Файл requests.http содержит готовые запросы для тестирования (можно открыть в PyCharm или VS Code с REST Client).

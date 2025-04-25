@@ -1,14 +1,54 @@
-GET http://127.0.0.1:8000/ads
-
-
-POST http://127.0.0.1:8000/ads
+### Регистрация
+POST http://localhost:8000/users/register
 Content-Type: application/json
 
 {
-  "title": "Продам ноутбук",
-  "description": "MacBook Pro 2021, состояние отличное",
-  "price": 150000
+  "name": "john",
+  "password": "1234"
 }
 
+### Логин
+POST http://localhost:8000/users/login
+Content-Type: application/json
 
-DELETE http://127.0.0.1:8000/ads/1
+{
+  "name": "john",
+  "password": "1234"
+}
+
+### Получить текущего пользователя (после логина вставьте токен)
+GET http://localhost:8000/users/me
+Authorization: Bearer {{token}}
+
+### Создать объявление
+POST http://localhost:8000/ads/
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Продам велик",
+  "description": "Почти новый"
+}
+
+### Получить все объявления
+GET http://localhost:8000/ads/
+
+### Обновить объявление (замените ID)
+PUT http://localhost:8000/ads/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Велосипед спортивный",
+  "description": "Теперь дешевле!"
+}
+
+### Удалить объявление
+DELETE http://localhost:8000/ads/1
+Authorization: Bearer {{token}}
+
+### Назначить роль
+POST http://localhost:8000/roles/assign?user_id=1&role_id=1
+
+### Получить список ролей
+GET http://localhost:8000/roles/
