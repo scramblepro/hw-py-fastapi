@@ -1,28 +1,32 @@
+# FastAPI Homework Project
 
-FastAPI-сервис объявлений
-Простой API для создания, редактирования, удаления и получения объявлений с авторизацией пользователей и ролями.
+Простой API-сервис на FastAPI с JWT-аутентификацией, CRUD и разделением прав пользователя.
 
-Установка и запуск:
+---
 
-git clone https://github.com/yourusername/your-repo.git
-cd your-repo
-python -m venv venv
-source venv/bin/activate  # или venv\Scripts\activate на Windows
+## Быстрый старт
+
+1. Клонируем репозиторий:
+   git clone https://github.com/scramblepro/hw-py-fastapi.git
+   cd hw-py-fastapi
+   
+Создаем виртуальное окружение и устанавливаем зависимости:
+python3 -m venv venv
+source venv/bin/activate      # Linux/macOS
+venv\Scripts\activate         # Windows
 pip install -r requirements.txt
-cp .env.example .env
 
-Переменные окружения (.env):
-Создайте файл .env по шаблону .env.example
+Создаем .env файл в корне:
+DATABASE_URL=sqlite:///./test.db      # или PostgreSQL: postgresql://user:pass@host/dbname
+SECRET_KEY=your_jwt_secret_key
 
-Запуск приложения:
+Запускаем миграции (если используются):
+alembic upgrade head
 
+Запускаем сервер:
 uvicorn app.main:app --reload
 
-Аутентификация:
+Открываем браузер:
+Swagger UI: http://127.0.0.1:8000/docs
+ReDoc (документация): http://127.0.0.1:8000/redoc
 
-Используется JWT. Для запросов, требующих авторизации, нужно передавать токен:
-
-Authorization: Bearer <ваш_токен>
-
-Примеры запросов:
-Файл requests.http содержит готовые запросы для тестирования (можно открыть в PyCharm или VS Code с REST Client).
